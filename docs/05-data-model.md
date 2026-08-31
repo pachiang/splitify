@@ -27,7 +27,12 @@ erDiagram
   categories ||--o{ expenses : classifies
 ```
 
-`expenses.group_id` 可為 null → 代表**好友間 1:1** 非群組帳目 (以 `friendships` 界定關係)。
+**好友 1:1 分帳用「隱含的雙人群組」表示** (`groups.type = 'friend'`,UI 不顯示為一般群組),
+因此 `expenses.group_id` 一律 **NOT NULL**。
+
+> 早期草案曾讓 `expenses.group_id` 可為 null 來表示非群組帳目,但 `expense_splits.member_id`
+> 指向 `group_members.id` —— 沒有群組就沒有 member 列,兩者矛盾。改用隱含群組後,
+> 拆帳/餘額/結算的邏輯對「群組」與「好友」完全一致,少掉一整類邊界情況。
 
 ## 3. 資料表 (草案)
 
@@ -46,7 +51,7 @@ create table users (
 create table groups (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  type text not null default 'general', -- trip | home | couple | general
+  type text not null default 'general', -- general | trip | home | couple | friend
   default_currency text not null default 'TWD',
   simplify_debts boolean not null default true,
   cover_url text,
@@ -67,11 +72,12 @@ create table group_members (
   unique (group_id, user_id)
 );
 
--- 好友 (1:1 非群組)
+-- 好友關係 (實際帳目掛在下面那個隱含的雙人群組上)
 create table friendships (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id) on delete cascade,
   friend_id uuid not null references users(id) on delete cascade,
+  group_id uuid references groups(id) on delete set null,  -- 兩人共用的隱含群組
   status text not null default 'active',       -- pending | active | blocked
   created_at timestamptz not null default now(),
   unique (user_id, friend_id)
@@ -90,7 +96,7 @@ create table categories (
 -- 帳目
 create table expenses (
   id uuid primary key default gen_random_uuid(),
-  group_id uuid references groups(id) on delete cascade,  -- null = 好友 1:1
+  group_id uuid not null references groups(id) on delete cascade,
   description text not null,
   total_amount bigint not null,          -- minor units, > 0
   currency text not null,

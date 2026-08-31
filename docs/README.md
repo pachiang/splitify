@@ -2,7 +2,10 @@
 
 一款跨平台 (iOS / Android) 分帳 App,對標 Splitwise,採 **freemium** 模式:核心免費、進階功能付費訂閱。主打「更好用的介面、更佛的免費額度、在地化 (台灣/亞洲) 與 AI 功能」。
 
-> 本資料夾是**規劃階段**的文件。程式碼與專案骨架尚未建立 (依決策先只寫文件)。所有技術細節皆為設計草案,實作時可再修正,但更動請回頭更新對應文件,維持「文件即真相」。
+> **Phase 0 已完成**:monorepo 骨架、`packages/{config,shared,core}`、`apps/mobile` (Expo SDK 57)、
+> `supabase/` (schema + RLS + 測試)、CI 皆已建立並驗證通過。
+> 文件中的 SQL 與介面為設計說明,**實作以 `supabase/migrations/` 與各 package 原始碼為準**;
+> 更動架構/資料模型時請回頭更新對應文件,維持「文件即真相」。
 
 ## 目前狀態
 
@@ -14,6 +17,7 @@
 | 付費 | ✅ RevenueCat + App Store / Google Play 內購 (IAP) |
 | 起步部署 | ✅ 全免費方案 (Supabase Free + EAS + RevenueCat Free);不採用 AWS |
 | 開發方式 | ✅ 幾乎全程 agent 驅動 → 架構以 agent 友善為第一優先 |
+| 進度 | ✅ Phase 0 完成(見 [07-roadmap](07-roadmap.md));下一步 Phase 1 MVP |
 
 ## 閱讀順序
 

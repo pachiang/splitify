@@ -2,7 +2,8 @@
 
 跨平台 (iOS / Android) 分帳 App,對標 Splitwise,freemium 模式。詳細規劃見 [`docs/`](docs/README.md)。
 
-> **現況**:Phase 0 進行中。Monorepo 骨架 + `packages/{config,shared,core}` 已建好且**測試綠燈** (`pnpm test` / `type-check` / `lint` 全過,共 31 個測試)。**尚未建立**:`apps/mobile` (Expo App)、`supabase/` (migrations + functions)、CI。開始寫程式前請先讀 `docs/` 對應文件。
+> **現況**:Phase 0 **已完成**。Monorepo 骨架、`packages/{config,shared,core}`、`apps/mobile` (Expo SDK 57)、`supabase/` (schema + RLS + 測試)、CI 皆已建立且驗證通過(`pnpm test` / `type-check` / `lint` 全綠,31 個單元測試;migrations 與 RLS 隔離測試已於 Postgres 實跑通過)。
+> **待辦**:建立實際 Supabase 專案並填 `apps/mobile/.env.local`;Edge Functions 於 Phase 1 實作。
 
 ## 技術棧 (已定案)
 
@@ -11,7 +12,7 @@
 - **Monorepo**:pnpm workspaces + Turborepo
 - **付費**:RevenueCat + App Store / Google Play 內購 (IAP)
 
-## 規劃中的專案結構
+## 專案結構
 
 ```
 splitify/
@@ -22,9 +23,11 @@ splitify/
 │   └── config/           # tsconfig / eslint / prettier 共用設定
 ├── supabase/
 │   ├── migrations/       # DB schema + RLS policies
-│   └── functions/        # Edge Functions (Deno / TS)
+│   ├── tests/            # RLS 隔離測試 (CI 以純 Postgres 執行)
+│   └── functions/        # Edge Functions (Deno / TS) — Phase 1
 ├── docs/                 # 規劃文件 (見 docs/README.md)
-└── (turbo.json / pnpm-workspace.yaml — 尚未建立)
+├── .github/workflows/    # CI
+└── turbo.json / pnpm-workspace.yaml
 ```
 
 ## 開發鐵則 (務必遵守)
